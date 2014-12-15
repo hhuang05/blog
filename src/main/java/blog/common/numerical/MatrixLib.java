@@ -202,4 +202,9 @@ public interface MatrixLib {
    * Returns true if the matrix is symmetric
    */
   public boolean isSymmetric();
+
+  /**
+   * Returns the condition number of the Matrix (2-norm)
+   */
+  public double cond();  
 }
