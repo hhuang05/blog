@@ -94,9 +94,16 @@ public class MultivarGaussian implements CondProbDistrib {
       this.hasMean = true;
     }
     if (covariance != null) {
-      if (!(covariance.numCols() > 0 && covariance.isSymmetric())) {
-        throw new IllegalArgumentException(
-            "The covariance matrix given is not symmetric");
+      if (!(covariance.numCols() > 0)) {
+	double condNumber = covariance.cond();
+	if (condNumber > 1000) {
+	  throw new IllegalArgumentException(
+	    "The covariance matrix given is ill-conditioned"); 
+	}
+	else if (!covariance.isSymmetric()) {
+	  throw new IllegalArgumentException(
+	    "The covariance matrix given is not symmetric");
+	}
       }
       this.covariance = covariance;
       this.hasCovariance = true;
