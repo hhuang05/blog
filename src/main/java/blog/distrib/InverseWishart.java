@@ -168,12 +168,13 @@ public class InverseWishart implements CondProbDistrib {
    */
   public double getLogProb(MatrixLib x) {
     checkHasParams();
-    if (x.numRows() == d && x.isSymmetric()) {
+    // Removed check for symmetry
+    if (x.numRows() == d) {
       return -x.logDet() * (freeDeg + d + 1) * 0.5
           - scale.timesMat(x.inverse()).trace() * 0.5 + logNormConst;
     }
     throw new IllegalArgumentException(
-        "The matrix given should be a symmetric one. But it isn't.");
+				       "The matrix given should be a symmetric one. But it isn't. Condition Number: " + x.cond());
   }
 
   /*
@@ -199,10 +200,16 @@ public class InverseWishart implements CondProbDistrib {
     MatrixLib temp = MatrixFactory.zeros(d, d);
     MultivarGaussian tmp = new MultivarGaussian();
     tmp.setParams(MatrixFactory.zeros(d, 1), scale);
-    for (int i = 0; i < freeDeg; i++) {
-      MatrixLib tmpmat = tmp.sample_value();
-      temp = temp.plus(tmpmat.timesMat(tmpmat.transpose()));
-    }
+    
+    // We keep sampling until we get a matrix with 
+    // a condition number less than 100
+    do {    	
+	for (int i = 0; i < freeDeg; i++) {
+	    MatrixLib tmpmat = tmp.sample_value();
+	    temp = temp.plus(tmpmat.timesMat(tmpmat.transpose()));
+	}
+    } while (temp.cond() > 100);
+
     return temp.inverse();
   }
 
