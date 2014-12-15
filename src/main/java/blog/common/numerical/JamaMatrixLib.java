@@ -296,4 +296,13 @@ public class JamaMatrixLib implements MatrixLib {
     return true;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see blog.common.numerical.MatrixLib#cond()
+   */
+  @Override
+  public double cond() {
+      return values.cond();
+  }
 }
